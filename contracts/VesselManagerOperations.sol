@@ -127,7 +127,7 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 			totals.totalDebtToOffset,
 			totals.totalCollToSendToSP
 		);
-		if (totals.totalCollSurplus > 0) {
+		if (totals.totalCollSurplus != 0) {
 			contractsCache.activePool.sendAsset(_asset, address(collSurplusPool), totals.totalCollSurplus);
 		}
 
@@ -185,7 +185,7 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 			totals.totalDebtToOffset,
 			totals.totalCollToSendToSP
 		);
-		if (totals.totalCollSurplus > 0) {
+		if (totals.totalCollSurplus != 0) {
 			activePoolCached.sendAsset(_asset, address(collSurplusPool), totals.totalCollSurplus);
 		}
 
@@ -480,8 +480,8 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 		vars.backToNormalMode = false;
 		vars.entireSystemDebt = getEntireSystemDebt(_asset);
 		vars.entireSystemColl = getEntireSystemColl(_asset);
-
-		for (vars.i = 0; vars.i < _vesselArray.length; ) {
+		uint256 leng = _vesselArray.length;
+		for (vars.i = 0; vars.i < leng; ) {
 			vars.user = _vesselArray[vars.i];
 			// Skip non-active vessels
 			if (vesselManager.getVesselStatus(_asset, vars.user) != uint256(IVesselManager.Status.active)) {
@@ -552,8 +552,8 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 		LiquidationValues memory singleLiquidation;
 
 		vars.remainingDebtTokenInStabPool = _debtTokenInStabPool;
-
-		for (vars.i = 0; vars.i < _vesselArray.length; ) {
+		uint256 leng = _vesselArray.length;
+		for (vars.i; vars.i < leng; ) {
 			vars.user = _vesselArray[vars.i];
 			vars.ICR = vesselManager.getCurrentICR(_asset, vars.user, _price);
 
@@ -602,7 +602,7 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 
 		vars.remainingDebtTokenInStabPool = _debtTokenInStabPool;
 
-		for (vars.i = 0; vars.i < _n; ) {
+		for (vars.i; vars.i < _n; ) {
 			vars.user = sortedVesselsCached.getLast(_asset);
 			vars.ICR = vesselManager.getCurrentICR(_asset, vars.user, _price);
 
@@ -751,7 +751,7 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 			);
 
 			vesselManagerCached.closeVesselLiquidation(_asset, _borrower);
-			if (singleLiquidation.collSurplus > 0) {
+			if (singleLiquidation.collSurplus != 0) {
 				collSurplusPool.accountSurplus(_asset, _borrower, singleLiquidation.collSurplus);
 			}
 			emit VesselLiquidated(
@@ -796,7 +796,7 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 
 		vars.user = _contractsCache.sortedVessels.getLast(assetVars._asset);
 		address firstUser = _contractsCache.sortedVessels.getFirst(assetVars._asset);
-		for (vars.i = 0; vars.i < _n && vars.user != firstUser; ) {
+		for (vars.i; vars.i < _n && vars.user != firstUser; ) {
 			// we need to cache it, because current user is likely going to be deleted
 			address nextUser = _contractsCache.sortedVessels.getPrev(assetVars._asset, vars.user);
 
@@ -870,7 +870,7 @@ contract VesselManagerOperations is IVesselManagerOperations, GravitaBase {
 			uint256 collToRedistribute
 		)
 	{
-		if (_debtTokenInStabPool > 0) {
+		if (_debtTokenInStabPool != 0) {
 			/*
 			 * Offset as much debt & collateral as possible against the Stability Pool, and redistribute the remainder
 			 * between all active vessels.

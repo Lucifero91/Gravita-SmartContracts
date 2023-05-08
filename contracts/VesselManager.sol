@@ -465,10 +465,10 @@ contract VesselManager is IVesselManager, GravitaBase {
 		uint256 _debtTokenAmount,
 		uint256 _assetAmount
 	) external onlyVesselManagerOperations {
-		if (_debtTokenAmount > 0) {
+		if (_debtTokenAmount != 0) {
 			debtToken.returnFromPool(gasPoolAddress, _liquidator, _debtTokenAmount);
 		}
-		if (_assetAmount > 0) {
+		if (_assetAmount != 0) {
 			adminContract.activePool().sendAsset(_asset, _liquidator, _assetAmount);
 		}
 	}
@@ -750,7 +750,7 @@ contract VesselManager is IVesselManager, GravitaBase {
 		uint256 paybackFraction = (_debtDecrease * 1 ether) / oldDebt;
 		uint256 newDebt = oldDebt - _debtDecrease;
 		vessel.debt = newDebt;
-		if (paybackFraction > 0) {
+		if (paybackFraction != 0) {
 			feeCollector.decreaseDebt(_borrower, _asset, paybackFraction);
 		}
 		return newDebt;

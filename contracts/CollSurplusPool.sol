@@ -71,12 +71,12 @@ contract CollSurplusPool is OwnableUpgradeable, ICollSurplusPool {
 
 		uint256 safetyTransferclaimableColl = SafetyTransfer.decimalsCorrection(_asset, claimableCollEther);
 
-		require(safetyTransferclaimableColl > 0, "CollSurplusPool: No collateral available to claim");
+		require(safetyTransferclaimableColl != 0, "CollSurplusPool: No collateral available to claim");
 
 		userBalance[_asset] = 0;
 		emit CollBalanceUpdated(_account, 0);
 
-		balances[_asset] = balances[_asset] - claimableCollEther;
+		balances[_asset] -= claimableCollEther;
 		emit AssetSent(_account, safetyTransferclaimableColl);
 
 		IERC20Upgradeable(_asset).safeTransfer(_account, safetyTransferclaimableColl);
@@ -84,7 +84,7 @@ contract CollSurplusPool is OwnableUpgradeable, ICollSurplusPool {
 
 	function receivedERC20(address _asset, uint256 _amount) external override {
 		_requireCallerIsActivePool();
-		balances[_asset] = balances[_asset] + _amount;
+		balances[_asset] += _amount;
 	}
 
 	// --- 'require' functions ---

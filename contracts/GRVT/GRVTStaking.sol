@@ -73,7 +73,7 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 
 	// If caller has a pre-existing stake, send any accumulated asset and debtToken gains to them.
 	function stake(uint256 _GRVTamount) external override nonReentrant whenNotPaused {
-		require(_GRVTamount > 0);
+		require(_GRVTamount != 0);
 
 		uint256 currentStake = stakes[msg.sender];
 
@@ -81,7 +81,7 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 		uint256 assetGain;
 		address asset;
 
-		for (uint256 i = 0; i < assetLength; i++) {
+		for (uint256 i; i < assetLength;) {
 			asset = ASSET_TYPE[i];
 
 			if (currentStake != 0) {
@@ -98,6 +98,9 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 			}
 
 			_updateUserSnapshots(asset, msg.sender);
+			unchecked {
+				++i;
+			}
 		}
 
 		uint256 newStake = currentStake + _GRVTamount;
@@ -123,7 +126,7 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 		uint256 assetGain;
 		address asset;
 
-		for (uint256 i = 0; i < assetLength; i++) {
+		for (uint256 i; i < assetLength;) {
 			asset = ASSET_TYPE[i];
 
 			// Grab any accumulated asset and debtToken gains from the current stake
@@ -138,9 +141,13 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 			_updateUserSnapshots(asset, msg.sender);
 			emit StakingGainsAssetWithdrawn(msg.sender, asset, assetGain);
 			_sendAssetGainToUser(asset, assetGain);
+
+			unchecked {
+				++i
+			}
 		}
 
-		if (_GRVTamount > 0) {
+		if (_GRVTamount != 0) {
 			uint256 GRVTToWithdraw = GravitaMath._min(_GRVTamount, currentStake);
 			uint256 newStake = currentStake - GRVTToWithdraw;
 
@@ -183,7 +190,7 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 
 		uint256 assetFeePerGRVTStaked;
 
-		if (totalGRVTStaked > 0) {
+		if (totalGRVTStaked != 0) {
 			assetFeePerGRVTStaked = _assetFee * DECIMAL_PRECISION / totalGRVTStaked;
 		}
 
@@ -198,7 +205,7 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 		}
 
 		uint256 feePerGRVTStaked;
-		if (totalGRVTStaked > 0) {
+		if (totalGRVTStaked != 0) {
 			feePerGRVTStaked = _debtTokenFee * DECIMAL_PRECISION / totalGRVTStaked;
 		}
 
@@ -268,6 +275,6 @@ contract GRVTStaking is IGRVTStaking, PausableUpgradeable, OwnableUpgradeable, B
 	}
 
 	function _requireUserHasStake(uint256 currentStake) internal pure {
-		require(currentStake > 0, "GRVTStaking: User must have a non-zero stake");
+		require(currentStake != 0, "GRVTStaking: User must have a non-zero stake");
 	}
 }

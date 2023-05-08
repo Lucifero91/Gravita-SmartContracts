@@ -43,7 +43,7 @@ contract LockedGRVT is Ownable, Initializable {
 
 		require(entitiesVesting[_entity].createdDate == 0, "Entity already has a Vesting Rule");
 
-		assignedGRVTTokens += _totalSupply;
+		assignedGRVTTokens = assignedGRVTTokens + _totalSupply;
 
 		entitiesVesting[_entity] = Rule(
 			block.timestamp,

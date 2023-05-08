@@ -101,7 +101,7 @@ contract Timelock {
 		}
 		pendingAdmin = pendingAdmin_;
 
-		emit NewPendingAdmin(pendingAdmin);
+		emit NewPendingAdmin(pendingAdmin_);
 	}
 
 	function queueTransaction(

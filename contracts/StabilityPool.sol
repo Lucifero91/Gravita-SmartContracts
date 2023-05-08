@@ -607,10 +607,10 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 		assets = adminContract.getValidCollateral();
 		uint256 assetsLen = assets.length;
 		amounts = new uint256[](assetsLen);
-		for (uint256 i = 0; i < assetsLen; ) {
+		for (uint256 i; i < assetsLen; ) {
 			amounts[i] = _getGainFromSnapshots(initialDeposit, snapshots, assets[i]);
 			unchecked {
-				i++;
+				++i;
 			}
 		}
 	}
@@ -770,11 +770,11 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 	) internal {
 		uint256 assetsLen = assets.length;
 		require(assetsLen == amounts.length, "StabilityPool: Length mismatch");
-		for (uint256 i = 0; i < assetsLen; ) {
+		for (uint256 i; i < assetsLen; ) {
 			uint256 amount = amounts[i];
 			if (amount == 0) {
 				unchecked {
-					i++;
+					++i;
 				}
 				continue;
 			}
@@ -782,7 +782,7 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 			// Assumes we're internally working only with the wrapped version of ERC20 tokens
 			IERC20Upgradeable(asset).safeTransfer(_to, amount);
 			unchecked {
-				i++;
+				++i;
 			}
 		}
 		totalColl.amounts = _leftSubColls(totalColl, assets, amounts);
@@ -814,10 +814,10 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 
 		Snapshots storage depositorSnapshots = depositSnapshots[_depositor];
 		if (_newValue == 0) {
-			for (uint256 i = 0; i < collsLen; ) {
+			for (uint256 i; i < collsLen; ) {
 				depositSnapshots[_depositor].S[colls[i]] = 0;
 				unchecked {
-					i++;
+					++i;
 				}
 			}
 			depositorSnapshots.P = 0;
@@ -831,12 +831,12 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 		uint128 currentEpochCached = currentEpoch;
 		uint256 currentP = P;
 
-		for (uint256 i = 0; i < collsLen; ) {
+		for (uint256 i; i < collsLen; ) {
 			address asset = colls[i];
 			uint256 currentS = epochToScaleToSum[asset][currentEpochCached][currentScaleCached];
 			depositSnapshots[_depositor].S[asset] = currentS;
 			unchecked {
-				i++;
+				++i;
 			}
 		}
 
@@ -869,17 +869,17 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 		uint256 coll1Len = _coll1.amounts.length;
 		uint256 tokensLen = _tokens.length;
 
-		for (uint256 i = 0; i < coll1Len; ) {
-			for (uint256 j = 0; j < tokensLen; ) {
+		for (uint256 i; i < coll1Len; ) {
+			for (uint256 j; j < tokensLen; ) {
 				if (_coll1.tokens[i] == _tokens[j]) {
 					_coll1.amounts[i] -= _amounts[j];
 				}
 				unchecked {
-					j++;
+					++j;
 				}
 			}
 			unchecked {
-				i++;
+				++i;
 			}
 		}
 
@@ -906,7 +906,7 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 	function _requireNoUnderCollateralizedVessels() internal {
 		address[] memory assets = adminContract.getValidCollateral();
 		uint256 assetsLen = assets.length;
-		for (uint256 i = 0; i < assetsLen; ) {
+		for (uint256 i; i < assetsLen; ) {
 			address assetAddress = assets[i];
 			address lowestVessel = sortedVessels.getLast(assetAddress);
 			uint256 price = adminContract.priceFeed().fetchPrice(assetAddress);
@@ -916,17 +916,17 @@ contract StabilityPool is ReentrancyGuardUpgradeable, GravitaBase, IStabilityPoo
 				"StabilityPool: Cannot withdraw while there are vessels with ICR < MCR"
 			);
 			unchecked {
-				i++;
+				++i;
 			}
 		}
 	}
 
 	function _requireUserHasDeposit(uint256 _initialDeposit) internal pure {
-		require(_initialDeposit > 0, "StabilityPool: User must have a non-zero deposit");
+		require(_initialDeposit != 0, "StabilityPool: User must have a non-zero deposit");
 	}
 
 	function _requireNonZeroAmount(uint256 _amount) internal pure {
-		require(_amount > 0, "StabilityPool: Amount must be non-zero");
+		require(_amount != 0, "StabilityPool: Amount must be non-zero");
 	}
 
 	// --- Fallback function ---

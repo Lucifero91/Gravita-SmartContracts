@@ -71,7 +71,7 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, BaseMath {
 			"CommunityIssuance: Stability Pool doesn't have enough supply."
 		);
 
-		GRVTSupplyCap -= _fundToRemove;
+		GRVTSupplyCap = GRVTSupplyCap - _fundToRemove;
 
 		grvtToken.safeTransfer(msg.sender, _fundToRemove);
 	}
@@ -89,7 +89,7 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, BaseMath {
 			lastUpdateTime = block.timestamp;
 		}
 
-		GRVTSupplyCap += _assignedSupply;
+		GRVTSupplyCap = GRVTSupplyCap + _assignedSupply;
 		grvtToken.safeTransferFrom(_spender, address(this), _assignedSupply);
 	}
 
